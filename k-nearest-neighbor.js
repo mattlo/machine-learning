@@ -96,6 +96,7 @@ function getType(sampleArea, sampleRooms) {
   }
 }
 
+// sample to test variance (using a constant room)
 for (var x = 200; x < 1000; x = x + 200) {
   console.log(getType(x, 1));
 }
