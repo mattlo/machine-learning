@@ -25,7 +25,7 @@ const covarianceMatrix = (function () {
 
 /**
  * Validates results by determining if there's a collision or not
- * @param {Array} items
+ * @param {Array} results
  * @returns {Boolean}
  */
 function collides(results) {
@@ -88,12 +88,20 @@ function getType(sampleArea, sampleRooms) {
   if (!collides(result)) {
     return result[0].type;
   } else {
-    console.log('adding area noise...');
-    //return getType(sampleArea + covarianceMatrix.area(), sampleRooms);
+    // @TODO fix noise
+    // generate new seeds
+    const p = Math.round(Math.random());
+    const a = covarianceMatrix.area[p] * 0.01;
+    const r = covarianceMatrix.rooms[p] * 0.2;
+    console.log(`adding noise; area: ${a}; rooms: ${r}...`);
+    return getType(sampleArea + a, sampleRooms + r);
   }
 }
 
-// sample to test variance (using a constant room)
-for (var x = 200; x < 1000; x = x + 200) {
-  console.log(getType(x, 1));
+// sampling extremes (using a constant room)
+for (let a = 1; a <= 5; ++a) {
+  let area = a * 200;
+  for (let rooms = 1; rooms <= 10; ++rooms) {
+    console.log(`area: ${area}, rooms: ${rooms}, `, getType(area, rooms));
+  }
 }
