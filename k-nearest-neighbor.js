@@ -28,8 +28,8 @@ const covarianceMatrix = (function () {
 
 /**
  * Validates results by determining if there's a collision or not
- * @param items
- * @returns {*}
+ * @param {Array} items
+ * @returns {Boolean}
  */
 function collides(results) {
   // if there's secondary result, we got a 100% match
