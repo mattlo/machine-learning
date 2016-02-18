@@ -7,9 +7,6 @@ const PROXIMITY_SAMPLE = 5;
 
 // determine the noise matrix
 const covarianceMatrix = (function () {
-  // noise percentage
-  const margin = 0.01;
-
   // tally numbers
   const totalReducer = (c, r) => c + parseFloat(r);
 
@@ -21,8 +18,8 @@ const covarianceMatrix = (function () {
   const matrix = (avg) => [avg, avg * -1];
 
   return {
-    rooms: () => matrix(average('rooms') * margin)[Math.round(Math.random())],
-    area: () => matrix(average('area') * margin)[Math.round(Math.random())]
+    rooms: matrix(average('rooms')),
+    area: matrix(average('area'))
   };
 })();
 
@@ -49,12 +46,12 @@ function collides(results) {
  */
 function getTypeDistances(sampleArea, sampleRooms) {
   const typeCounts = properties
-    // get euclidean distance point from sample
+    // get normalized euclidean distance point from sample
     .map(({area, rooms, type}) => {
       return {
         distance: Math.sqrt(
-          Math.pow(area - sampleArea, 2) +
-          Math.pow(rooms - sampleRooms, 2)
+          Math.pow((area - sampleArea) / covarianceMatrix.area[0], 2) +
+          Math.pow((rooms - sampleRooms) / covarianceMatrix.rooms[0], 2)
         ),
         area,
         rooms,
@@ -92,7 +89,7 @@ function getType(sampleArea, sampleRooms) {
     return result[0].type;
   } else {
     console.log('adding area noise...');
-    return getType(sampleArea + covarianceMatrix.area(), sampleRooms);
+    //return getType(sampleArea + covarianceMatrix.area(), sampleRooms);
   }
 }
 
