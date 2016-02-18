@@ -98,7 +98,7 @@ function getType(sampleArea, sampleRooms) {
   }
 }
 
-// sampling extremes (using a constant room)
+// sampling
 for (let a = 1; a <= 5; ++a) {
   let area = a * 200;
   for (let rooms = 1; rooms <= 10; ++rooms) {
