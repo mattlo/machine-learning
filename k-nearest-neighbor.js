@@ -1,11 +1,30 @@
 // sample size should have enough disparity
-import rooms from './sources/rooms.js';
+import properties from './sources/properties';
 
 // level of accuracy, needs to be an odd number
+// the lower the number, the lower the accuracy
 const PROXIMITY_SAMPLE = 5;
 
-// value to resolve collisions
-const NOISE = 0.2;
+// determine the noise matrix
+const covarianceMatrix = (function () {
+  // noise percentage
+  const margin = 0.01;
+
+  // tally numbers
+  const totalReducer = (c, r) => c + parseFloat(r);
+
+  // determine avg of numbers
+  const average = (prop) => properties.map(r => r[prop])
+      .reduce(totalReducer, 0) / properties.length;
+
+  // get matrix e.g.: [1, -1]
+  const matrix = (avg) => [avg, avg * -1];
+
+  return {
+    rooms: () => matrix(average('rooms') * margin)[Math.round(Math.random())],
+    area: () => matrix(average('area') * margin)[Math.round(Math.random())]
+  };
+})();
 
 /**
  * Validates results by determining if there's a collision or not
@@ -22,9 +41,14 @@ function collides(results) {
   return results[0].count <= results[1].count;
 }
 
-
+/**
+ * Calculates distance of items and returns nearest type results
+ * @param {Number} sampleArea
+ * @param {Number} sampleRooms
+ * @returns {Array<{Object}>}
+ */
 function getTypeDistances(sampleArea, sampleRooms) {
-  const typeCounts = rooms
+  const typeCounts = properties
     // get euclidean distance point from sample
     .map(({area, rooms, type}) => {
       return {
@@ -38,7 +62,7 @@ function getTypeDistances(sampleArea, sampleRooms) {
       }
     })
     // sort by closest to largest
-    .sort((a, b) => a - b)
+    .sort((a, b) => a.distance - b.distance)
     // sample the closest ones
     .filter((a, index) => index < PROXIMITY_SAMPLE)
     // reduce to a tally of types
@@ -55,7 +79,7 @@ function getTypeDistances(sampleArea, sampleRooms) {
 }
 
 /**
- * Initializes operation
+ * Returns the ~type
  * @param {Number} sampleArea
  * @param {Number} sampleRooms
  * @returns {String}
@@ -68,8 +92,10 @@ function getType(sampleArea, sampleRooms) {
     return result[0].type;
   } else {
     console.log('adding noise...');
-    return getType(sampleArea - NOISE, sampleRooms);
+    return getType(sampleArea + covarianceMatrix.area(), sampleRooms);
   }
 }
 
-console.log(getType(350, 1));
+for (var x = 200; x < 1000; x = x + 200) {
+  console.log(getType(x, 1));
+}
