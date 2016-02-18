@@ -91,7 +91,7 @@ function getType(sampleArea, sampleRooms) {
   if (!collides(result)) {
     return result[0].type;
   } else {
-    console.log('adding noise...');
+    console.log('adding area noise...');
     return getType(sampleArea + covarianceMatrix.area(), sampleRooms);
   }
 }
